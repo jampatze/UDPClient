@@ -27,9 +27,6 @@ namespace UDPClient
         EndPoint epServer;
         // data stream
         private byte[] dataStream = new byte[1024];
-        // display message delegate
-        private delegate void DisplayMessageDelegate(string message);
-        private DisplayMessageDelegate displayMessageDelegate = null;
 
         public MainWindow()
         {
@@ -37,15 +34,6 @@ namespace UDPClient
             buttonSend.IsEnabled = false;
         }
 
-        /// <summary>
-        /// Initialises the delegate on load
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Client_Load(object sender, EventArgs e)
-        {
-            this.displayMessageDelegate = new DisplayMessageDelegate(this.DisplayMessage);
-        }
 
         /// <summary>
         /// Parses the message and sends
