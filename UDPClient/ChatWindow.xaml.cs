@@ -19,7 +19,6 @@ namespace UDPClient
 {
     /// <summary>
     /// Interaction logic for ChatWindow.xaml
-    /// TODO: disconnect when closing down
     /// </summary>
     public partial class ChatWindow : UserControl
     {
@@ -28,11 +27,24 @@ namespace UDPClient
         EndPoint epServer;
         // data stream
         private byte[] dataStream = new byte[1024];
+        // display message delegate
+        private delegate void DisplayMessageDelegate(string message);
+        private DisplayMessageDelegate displayMessageDelegate = null;
 
         public ChatWindow()
         {
             InitializeComponent();
             buttonSend.IsEnabled = false;
+        }
+
+        /// <summary>
+        /// Initialises the delegate on load
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Client_Load(object sender, EventArgs e)
+        {
+            this.displayMessageDelegate = new DisplayMessageDelegate(this.DisplayMessage);
         }
 
         /// <summary>
@@ -48,8 +60,6 @@ namespace UDPClient
                 sendData.strName = textBoxName.Text;
                 sendData.strMessage = textBoxMessage.Text.Trim();
                 sendData.cmdCommand = Command.Message;
-
-                DisplayMessage(sendData.strMessage);
                 
                 // Get packet as byte array
                 byte[] byteData = sendData.ToByte();
@@ -127,20 +137,17 @@ namespace UDPClient
         {
             try
             {
-                this.clientSocket.EndReceive(ar);
-
-                CustomPacket receivedData = new CustomPacket(this.dataStream);
+                clientSocket.EndReceive(ar);
+                CustomPacket receivedData = new CustomPacket(dataStream);
 
                 if (receivedData.strMessage != null)
-                    this.DisplayMessage(receivedData.strMessage);
+                    this.Dispatcher.Invoke(this.displayMessageDelegate, new object[] { receivedData.strMessage });
 
-                // Reset data stream
-                this.dataStream = new byte[1024];
-
-                clientSocket.BeginReceiveFrom(this.dataStream, 0, this.dataStream.Length, SocketFlags.None, ref epServer, new AsyncCallback(this.ReceiveData), null);
             }
+
             catch (ObjectDisposedException)
             { }
+
             catch (Exception ex)
             {
                 MessageBox.Show("Error while recieving data: " + ex.Message, "UDP Client");
@@ -148,12 +155,39 @@ namespace UDPClient
         }
 
         /// <summary>
-        /// Displays message to the chatBox
+        /// When the chat closes
+        /// </summary>
+        public void Close()
+        {
+            try
+            {
+                if (this.clientSocket != null)
+                {
+                    CustomPacket sendData = new CustomPacket();
+                    sendData.cmdCommand = Command.Logout;
+                    sendData.strName = textBoxName.Text;
+                    sendData.strMessage = null;
+
+                    byte[] byteData = sendData.ToByte();
+
+                    this.clientSocket.SendTo(byteData, 0, byteData.Length, SocketFlags.None, epServer);
+
+                    this.clientSocket.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error while closing: " + ex.Message, "UDP Client");
+            }
+        }
+
+        /// <summary>
+        /// Displays the message in the chatBox
         /// </summary>
         /// <param name="messge"></param>
         private void DisplayMessage(string message)
         {
-            chatBox.Document.Blocks.Add(new Paragraph(new Run(message + Environment.NewLine)));
+            chatBox.AppendText(message + Environment.NewLine);
         }
 
     }

@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:UDPClient"
-             mc:Ignorable="d" Width="407" Height="327">
-    <Grid Background="White" Margin="20,0,0,0">
+             mc:Ignorable="d">
+    <Grid Background="White" Margin="0,0,0,0">
         <Border BorderBrush="Blue" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top" Height="74" Margin="10,10,0,0" Width="274">
             <Grid HorizontalAlignment="Left" Height="72" VerticalAlignment="Top" Width="272">
                 <Label Content="Name:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="25"/>
@@ -18,7 +18,7 @@
         <Button x:Name="buttonSend" Content="Send" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Margin="0,0,10,20" Click="buttonSend_Click"/>
         <TextBox x:Name="textBoxMessage" HorizontalAlignment="Stretch" Height="23" Margin="10,0,95,20" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
         <Border BorderBrush="Blue" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="10,100,10,60">
-            <RichTextBox x:Name="chatBox" IsEnabled="False">
+            <RichTextBox x:Name="chatBox" IsEnabled="False" HorizontalScrollBarVisibility="Auto">
                 <FlowDocument>
                     <Paragraph>
                         <Run Text=""/>
