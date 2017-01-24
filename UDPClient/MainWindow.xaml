@@ -20,9 +20,9 @@
         <Button x:Name="buttonSend" Content="Send" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Margin="0,0,10,20" Click="buttonSend_Click"/>
         <TextBox x:Name="textBoxMessage" HorizontalAlignment="Stretch" Height="23" Margin="10,0,95,20" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
         <Border BorderBrush="Blue" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="10,100,10,60">
-            <RichTextBox x:Name="chatBox" IsEnabled="False" HorizontalScrollBarVisibility="Auto">
+            <RichTextBox x:Name="chatBox" IsEnabled="False" VerticalScrollBarVisibility="Visible">
                 <FlowDocument>
-                    <Paragraph>
+                    <Paragraph LineHeight="20">
                         <Run Text=""/>
                     </Paragraph>
                 </FlowDocument>
