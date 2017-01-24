@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UDPClient"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="500" Width="650">
     <Grid>
-        
+        <local:ChatWindow VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0" Width="Auto" Height="auto"/>
     </Grid>
 </Window>
