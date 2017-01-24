@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,12 +19,142 @@ namespace UDPClient
 {
     /// <summary>
     /// Interaction logic for ChatWindow.xaml
+    /// TODO: disconnect when closing down
     /// </summary>
     public partial class ChatWindow : UserControl
     {
+        private Socket clientSocket;
+        int port = 9999;
+        EndPoint epServer;
+        // data stream
+        private byte[] dataStream = new byte[1024];
+
         public ChatWindow()
         {
             InitializeComponent();
+            buttonSend.IsEnabled = false;
         }
+
+        /// <summary>
+        /// Parses the message and sends
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonSend_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                CustomPacket sendData = new CustomPacket();
+                sendData.strName = textBoxName.Text;
+                sendData.strMessage = textBoxMessage.Text.Trim();
+                sendData.cmdCommand = Command.Message;
+
+                DisplayMessage(sendData.strMessage);
+                
+                // Get packet as byte array
+                byte[] byteData = sendData.ToByte();
+
+                // Send packet to the server
+                clientSocket.BeginSendTo(byteData, 0, byteData.Length, SocketFlags.None, epServer, new AsyncCallback(this.SendData), null);
+
+
+                textBoxMessage.Text = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Send while sending message: " + ex.Message, "UDP Client");
+            }
+        }
+
+        /// <summary>
+        /// Logs the user in to the server
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonConnect_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                CustomPacket sendData = new CustomPacket();
+                sendData.strName = this.textBoxName.Text;
+                sendData.strMessage = null;
+                sendData.cmdCommand = Command.Login;
+
+                this.clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
+                IPAddress serverIP = IPAddress.Parse(textBoxServer.Text);
+                IPEndPoint server = new IPEndPoint(serverIP, port);
+                epServer = (EndPoint)server;
+
+                byte[] data = sendData.ToByte();
+
+                clientSocket.BeginSendTo(data, 0, data.Length, SocketFlags.None, epServer, new AsyncCallback(this.SendData), null);
+
+                this.dataStream = new byte[1024];
+
+                // Begin listening for broadcasts
+                clientSocket.BeginReceiveFrom(this.dataStream, 0, this.dataStream.Length, SocketFlags.None, ref epServer, new AsyncCallback(this.ReceiveData), null);
+                buttonSend.IsEnabled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error while connecting to server: " + ex.Message, "UDP Client");
+            }
+        }
+
+
+        /// <summary>
+        /// Sends data
+        /// </summary>
+        /// <param name="ar"></param>
+        private void SendData(IAsyncResult ar)
+        {
+            try
+            {
+                clientSocket.EndSend(ar);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error while sending data: " + ex.Message, "UDP Client");
+            }
+        }
+
+        /// <summary>
+        /// Revieves data
+        /// </summary>
+        /// <param name="ar"></param>
+        private void ReceiveData(IAsyncResult ar)
+        {
+            try
+            {
+                this.clientSocket.EndReceive(ar);
+
+                CustomPacket receivedData = new CustomPacket(this.dataStream);
+
+                if (receivedData.strMessage != null)
+                    this.DisplayMessage(receivedData.strMessage);
+
+                // Reset data stream
+                this.dataStream = new byte[1024];
+
+                clientSocket.BeginReceiveFrom(this.dataStream, 0, this.dataStream.Length, SocketFlags.None, ref epServer, new AsyncCallback(this.ReceiveData), null);
+            }
+            catch (ObjectDisposedException)
+            { }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error while recieving data: " + ex.Message, "UDP Client");
+            }
+        }
+
+        /// <summary>
+        /// Displays message to the chatBox
+        /// </summary>
+        /// <param name="messge"></param>
+        private void DisplayMessage(string message)
+        {
+            chatBox.Document.Blocks.Add(new Paragraph(new Run(message + Environment.NewLine)));
+        }
+
     }
 }

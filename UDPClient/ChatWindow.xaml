@@ -11,12 +11,12 @@
                 <Label Content="Name:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="25"/>
                 <Label Content="Server:" HorizontalAlignment="Left" Margin="10,37,0,10"/>
                 <TextBox x:Name="textBoxName" HorizontalAlignment="Left" Height="23" Margin="65,12,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-                <TextBox x:Name="textBox" HorizontalAlignment="Left" Margin="65,40,0,9" TextWrapping="Wrap" Width="120"/>
-                <Button x:Name="buttonConnect" Content="Connect" Margin="194,13,10,10"/>
+                <TextBox x:Name="textBoxServer" HorizontalAlignment="Left" Margin="65,40,0,9" TextWrapping="Wrap" Width="120"/>
+                <Button x:Name="buttonConnect" Content="Connect" Margin="194,13,10,10" Click="buttonConnect_Click"/>
             </Grid>
         </Border>
-        <Button x:Name="buttonSend" Content="Send" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Margin="0,0,10,20"/>
-        <TextBox x:Name="textBox1" HorizontalAlignment="Stretch" Height="23" Margin="10,0,95,20" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+        <Button x:Name="buttonSend" Content="Send" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Margin="0,0,10,20" Click="buttonSend_Click"/>
+        <TextBox x:Name="textBoxMessage" HorizontalAlignment="Stretch" Height="23" Margin="10,0,95,20" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
         <Border BorderBrush="Blue" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="10,100,10,60">
             <RichTextBox x:Name="chatBox" IsEnabled="False">
                 <FlowDocument>
